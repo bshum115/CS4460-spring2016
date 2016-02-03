@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script type="text/javascript" src="d3/d3.js"></script>
+
+        <style>
+            
+            .chart {
+				/* Adding a background to our canvas */
+                background: #cfcfcf;
+            }
+            
+            .chart rect {
+              fill: steelblue;
+            }
+
+            .chart text {
+              fill: white;
+              font: 10px sans-serif;
+              text-anchor: middle;
+            }
+
+             text.xText{
+              fill: black;
+              font: 10px sans-serif;
+              text-anchor: middle;
+            }
+
+            .bar{
+              stroke: none;
+              fill: steelblue;
+            } 
+        </style>
+
+
+    </head>
+
+
+    <body>
+        <svg class="chart"></svg>
+        <script type="text/javascript"> //src = d3/d3.js?
+
+            //##############    1    ####################
+            //Setting the size of our canvas
+            var width = 780; 
+            var height = 460; 
+
+            //Setting our x and y axes
+            //RangeRoundBands returns the band width. Decimal value is the padding
+            //Range provides the band height (because of the inverted values).
+            var x = d3.scale.ordinal().rangeRoundBands([0, width], 0.1);
+            var y = d3.scale.linear().range([height, 0]);
+
+            var xAxis = d3.svg.axis()
+              .scale(x)
+              .orient("bottom");
+
+            var yAxis = d3.svg.axis()
+              .scale(y)
+              .orient("left");
+
+
+            //Creating our chart and grabbing attributes from ".chart" in header
+            var chart = d3.select(".chart")
+                .attr("width", width)
+                .attr("height", height);
+				
+
+            //##############    2    ####################
+            //Pulling data from .csv file 
+            d3.csv("State-GPA.csv", function(error, data){
+
+                data = data.map(function(d){ 
+                d["Average-GPA"] = +d["Average-GPA"]; 
+                return d;
+                });
+
+                //Set our scale domains
+                //data.map creates a new array with the result of a function of every element in the array
+                x.domain(data.map(function(d) { return d["State"]; }));
+                y.domain([0, d3.max(data, function(d) { return d["Average-GPA"]; })]);
+
+                var y_translate = 50;
+                var x_translate = 0;
+                /* Talk about this later */
+
+                //##############    3    ####################
+                //Grabbing data and binding it to the bars
+                //"G" groups all the svg elements together
+               
+                var bar = chart.selectAll("g")
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("transform", function(d) { return "translate("+ x_translate +",0)"; });          
+                // Translate arranges all the "g" elements on the X axis.
+                // Without the translate, all the groups would be drawn at the same position
+
+
+                bar.append("rect")      //Adds a black bar used to outline the actual bars with data
+                .attr("x", function(d){ return x(d["State"]) - 1; })      
+                .attr("y", function(d){ return y(d["Average-GPA"] + .01); })
+                .attr("height", function(d){ return height - y_translate  - y(d["Average-GPA"]); })   //Controls the height of the black bar used as an outline
+                .attr("width", function(d){ return x.rangeBand() + 2; })
+                .style("fill", function(d){
+                  return "black";
+                });
+
+                bar.append("rect")      //Adds the bars that correpsond to the actual data in the csv file
+                .attr("x", function(d){ return x(d["State"]); })
+                .attr("y", function(d){ return y(d["Average-GPA"]); })
+                .attr("height", function(d){ return height - y_translate - y(d["Average-GPA"]); })
+                .attr("width", function(d){ return x.rangeBand(); })
+                 .style("fill", function(d){
+                    if(d["Average-GPA"] < 1){           //Changes the colors of the bars depending on the GPA
+                      return "red";
+                    }
+                    else{
+                      if((d["Average-GPA"] < 2)){
+                        return "orange";
+                      }
+                      else{
+                        if((d["Average-GPA"] < 3)){
+                          return "yellow";
+                        }
+                        else{
+                          if((d["Average-GPA"] < 4)){
+                            return "blue";
+                          }                                        
+                          else{
+                           return "gold";
+                           }
+                        }
+                      }
+                    }
+                  });
+
+                
+
+                //Logging data to the console so we can make sure the data is bound
+                console.log(data);
+
+
+                //##############    5    ####################
+
+
+                //TO DO: FIX THE LABELS -- THE LABELS ARE ALL STACKING ON THE SAME POSITION WITH THE BELOW CODE AND ADD COLORS TO THEM
+                //The below code was modified from the finished code the TA gave us. I just changed the return value to match the csv format
+                //Adding y labels to our bars
+                  bar.append("text")
+                  .attr("x", x.rangeBand() / 2)
+                  .attr("y", function(d) { return y(d.value) + 3; })
+                  .attr("dy", ".75em")
+                  .text(function(d) { return d["Average-GPA"]; });
+
+                //Adding x labels to our bars
+                bar.append("text")
+                  .attr("class", "xText")
+                  .attr("x", x.rangeBand() / 2)
+                  .attr("y", height - y_translate)
+                  .attr("dy", ".75em")
+                  .text(function(d) { return d["State"]; });
+
+            });
+            
+
+        </script>
+    </body>
+</html>
