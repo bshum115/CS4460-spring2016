@@ -148,19 +148,40 @@
                 //##############    5    ####################
 
 
-                //TO DO: FIX THE LABELS -- THE LABELS ARE ALL STACKING ON THE SAME POSITION WITH THE BELOW CODE AND ADD COLORS TO THEM
-                //The below code was modified from the finished code the TA gave us. I just changed the return value to match the csv format
                 //Adding y labels to our bars
                   bar.append("text")
-                  .attr("x", x.rangeBand() / 2)
-                  .attr("y", function(d) { return y(d.value) + 3; })
+                  .attr("x", function(d){return x(d["State"]) + (x.rangeBand() / 2);})  
+                  .attr("y", function(d) { return y(d["Average-GPA"]) + 3; })
                   .attr("dy", ".75em")
-                  .text(function(d) { return d["Average-GPA"]; });
+                  .text(function(d) { return d["Average-GPA"]; })
+                  .style("fill", function(d){
+                    if(d["Average-GPA"] < 1){           //Changes the colors of the bars depending on the GPA
+                      return "white";
+                    }
+                    else{
+                      if((d["Average-GPA"] < 2)){
+                        return "black";
+                      }
+                      else{
+                        if((d["Average-GPA"] < 3)){
+                          return "black";
+                        }
+                        else{
+                          if((d["Average-GPA"] < 4)){
+                            return "gold";
+                          }                                        
+                          else{
+                           return "black";
+                           }
+                        }
+                      }
+                    } 
+                  });
 
                 //Adding x labels to our bars
                 bar.append("text")
                   .attr("class", "xText")
-                  .attr("x", x.rangeBand() / 2)
+                  .attr("x", function(d){return x(d["State"]) + (x.rangeBand() / 2);})  
                   .attr("y", height - y_translate)
                   .attr("dy", ".75em")
                   .text(function(d) { return d["State"]; });
