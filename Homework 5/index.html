@@ -104,7 +104,7 @@
                 bar.append("rect")      //Adds a black bar used to outline the actual bars with data
                 .attr("x", function(d){ return x(d["State"]) - 1; })      
                 .attr("y", function(d){ return y(d["Average-GPA"] + .01); })
-                .attr("height", function(d){ return height - y_translate  - y(d["Average-GPA"]); })   //Controls the height of the black bar used as an outline
+                .attr("height", function(d){ return height - y_translate + 2  - y(d["Average-GPA"]); })   //Controls the height of the black bar used as an outline
                 .attr("width", function(d){ return x.rangeBand() + 2; })
                 .style("fill", function(d){
                   return "black";
@@ -182,7 +182,7 @@
                 bar.append("text")
                   .attr("class", "xText")
                   .attr("x", function(d){return x(d["State"]) + (x.rangeBand() / 2);})  
-                  .attr("y", height - y_translate)
+                  .attr("y", height - y_translate + 3)
                   .attr("dy", ".75em")
                   .text(function(d) { return d["State"]; });
 
